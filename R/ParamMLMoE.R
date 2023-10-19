@@ -66,7 +66,7 @@ ParamMLMoE <- setRefClass(
       # sigma2 <<- matrix(NA, 1, K)
     },
 
-    initParam = function(segmental = FALSE, nearTrue, wk_star, eta_star) {
+    initParam = function(segmental = FALSE, nearTrue, wk_star, etak_star) {
       "Method to initialize parameters \\code{wk}, \\code{eta} and
       \\code{sigma2}.
 
@@ -86,7 +86,7 @@ ParamMLMoE <- setRefClass(
         # wk <<- matrix(0, q + 1, K - 1)
         # eta <<- array(0, dim = c(p + 1, K, R-1))
         ###
-        Ks <- dim(eta_star)[2]
+        Ks <- dim(etak_star)[2]
         qt <- dim(wk_star)[1]
         inds <- seq(from = 1, to = Ks, by = 1)
         while (TRUE){
@@ -109,7 +109,7 @@ ParamMLMoE <- setRefClass(
             }
 
           }
-          etak[, i, ] <<- eta_star[, s_inds[i], ] +
+          etak[, i, ] <<- etak_star[, s_inds[i], ] +
             stats::rnorm(n = 1, mean = 0, sd = 0.007*n^(-0.083))
         }
       # We do not initialize the EM algorithm favourably by making

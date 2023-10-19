@@ -18,8 +18,8 @@ emMLMoE(
   verbose_IRLS = FALSE,
   update_IRLS = TRUE,
   nearTrue = FALSE,
-  alphak_0 = NA,
-  betak_0 = NA
+  wk_star = NA,
+  etak_star = NA
 )
 }
 \arguments{

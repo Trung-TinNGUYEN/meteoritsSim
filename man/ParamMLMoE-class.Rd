@@ -45,7 +45,7 @@ of the model.}
 \section{Methods}{
 
 \describe{
-\item{\code{initParam(segmental = FALSE, nearTrue, wk_star, eta_star)}}{Method to initialize parameters \code{wk}, \code{eta} and
+\item{\code{initParam(segmental = FALSE, nearTrue, wk_star, etak_star)}}{Method to initialize parameters \code{wk}, \code{eta} and
       \code{sigma2}.
 
       If \code{segmental = TRUE} then \code{wk}, \code{eta} and

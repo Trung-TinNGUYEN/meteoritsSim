@@ -51,7 +51,7 @@
 #' 2. param$MStep.
 emMLMoE <- function(X, Y, K, R,  p = 1, q = 1, n_tries = 1, max_iter = 1500,
                    threshold = 1e-6, verbose = FALSE, verbose_IRLS = FALSE, update_IRLS = TRUE,
-                   nearTrue = FALSE, alphak_0 = NA, betak_0 = NA) {
+                   nearTrue = FALSE, wk_star = NA, etak_star = NA) {
 
   top <- 0
   try_EM <- 0
@@ -66,7 +66,7 @@ emMLMoE <- function(X, Y, K, R,  p = 1, q = 1, n_tries = 1, max_iter = 1500,
 
     # Initializations
     param <- ParamMLMoE(X = X, Y = Y, K = K, R = R, p = p, q = q)
-    param$initParam(segmental = FALSE, nearTrue, wk_star, eta_star)
+    param$initParam(segmental = FALSE, nearTrue, wk_star, etak_star)
 
     # print(param$alpha)
 

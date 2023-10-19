@@ -4,14 +4,14 @@
 \alias{sampleLogisticMoE}
 \title{Draw a sample from a normal mixture of linear experts model.}
 \usage{
-sampleLogisticMoE(wk_star, eta_star, x)
+sampleLogisticMoE(wk_star, etak_star, x)
 }
 \arguments{
 \item{wk_star}{The parameters of the gating network. `wk_star` is a matrix of
 size \emph{(q + 1, K - 1)}, with \emph{K - 1}, the number of regressors
 (experts) and \emph{q} the order of the logistic regression}
 
-\item{eta_star}{Array of size \emph{(K, R-1, d)} representing the regression
+\item{etak_star}{Array of size \emph{(K, R-1, d)} representing the regression
 coefficients of the experts network.}
 
 \item{x}{A vector og length \emph{n} representing the inputs (predictors).}
@@ -48,12 +48,12 @@ Draw a sample from a normal mixture of linear experts model.
 \examples{
 n <- 500 # Size of the sample
 wk_star <- matrix(c(0, 8), ncol = 1) # Parameters of the gating network
-eta_star <- matrix(c(0, -2.5, 0, 2.5), ncol = 2) # Regression coefficients of the experts
+etak_star <- matrix(c(0, -2.5, 0, 2.5), ncol = 2) # Regression coefficients of the experts
 sigmak <- c(1, 1) # Standard deviations of the experts
 x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 
 # Generate sample of size n
-sample <- sampleUnivNMoE(wk_star = wk_star, eta_star = eta_star, sigmak = sigmak, x = x)
+sample <- sampleUnivNMoE(wk_star = wk_star, etak_star = etak_star, sigmak = sigmak, x = x)
 
 # Plot points and estimated means
 plot(x, sample$y, pch = 4)
