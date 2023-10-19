@@ -3,7 +3,7 @@
 #' @param wk_star The parameters of the gating network. `wk_star` is a matrix of
 #'   size \emph{(q + 1, K - 1)}, with \emph{K - 1}, the number of regressors
 #'   (experts) and \emph{q} the order of the logistic regression
-#' @param eta_star Array of size \emph{(K, R-1, d)} representing the regression
+#' @param etak_star Array of size \emph{(K, R-1, d)} representing the regression
 #'   coefficients of the experts network.
 #' @param x A vector og length \emph{n} representing the inputs (predictors).
 #'
@@ -36,12 +36,12 @@
 #' @examples
 #' n <- 500 # Size of the sample
 #' wk_star <- matrix(c(0, 8), ncol = 1) # Parameters of the gating network
-#' eta_star <- matrix(c(0, -2.5, 0, 2.5), ncol = 2) # Regression coefficients of the experts
+#' etak_star <- matrix(c(0, -2.5, 0, 2.5), ncol = 2) # Regression coefficients of the experts
 #' sigmak <- c(1, 1) # Standard deviations of the experts
 #' x <- seq.int(from = -1, to = 1, length.out = n) # Inputs (predictors)
 #'
 #' # Generate sample of size n
-#' sample <- sampleUnivNMoE(wk_star = wk_star, eta_star = eta_star, sigmak = sigmak, x = x)
+#' sample <- sampleUnivNMoE(wk_star = wk_star, etak_star = etak_star, sigmak = sigmak, x = x)
 #'
 #' # Plot points and estimated means
 #' plot(x, sample$y, pch = 4)
@@ -49,17 +49,17 @@
 #' lines(x, sample$stats$Ey_k[, 2], col = "blue", lty = "dotted", lwd = 1.5)
 #' lines(x, sample$stats$Ey, col = "red", lwd = 1.5)
 
-sampleLogisticMoE <- function(wk_star, eta_star, x) {
+sampleLogisticMoE <- function(wk_star, etak_star, x) {
   ## Test code
   n <- length(x)
-  # p <- nrow(eta_star) - 1 # p<- d, beta <- (a,b)
+  # p <- nrow(etak_star) - 1 # p<- d, beta <- (a,b)
   # q <- nrow(wk_star) - 1 # q <- d, alpha <- (beta0,beta1)
-  # K = ncol(eta_star) # K <- k*
+  # K = ncol(etak_star) # K <- k*
   # wk <<- matrix(0, q + 1, K - 1)
   # eta <<- array(0, dim = c(p + 1, K, R-1))
-  p <- dim(eta_star)[1] - 1 # p<- d, beta <- (a,b)
+  p <- dim(etak_star)[1] - 1 # p<- d, beta <- (a,b)
   q <- dim(wk_star)[1] - 1 # q <- d, alpha <- (beta0,beta1)
-  K <- dim(eta_star)[2] # K <- k*
+  K <- dim(etak_star)[2] # K <- k*
 
   # Build the regression design matrices
 
@@ -76,7 +76,7 @@ sampleLogisticMoE <- function(wk_star, eta_star, x) {
   for (i in 1:n) {
     zik_wk <- stats::rmultinom(n = 1, size = 1, piik_wk[i,])
 
-    piik_eta_i <- multinomialLogit(as.matrix(eta_star[zik_wk == 1,,]),
+    piik_eta_i <- multinomialLogit(as.matrix(etak_star[zik_wk == 1,,]),
                                    t(as.matrix(XAlpha[i,])), zeros(1, K), ones(1, 1))$piik
 
     zik_eta <- stats::rmultinom(n = 1, size = 1, piik_eta_i)
@@ -89,13 +89,13 @@ sampleLogisticMoE <- function(wk_star, eta_star, x) {
 }
 
 ## Original sampleUnivNMoE
-# sampleUnivNMoE <- function(wk_star, eta_star, sigmak, x) {
+# sampleUnivNMoE <- function(wk_star, etak_star, sigmak, x) {
 #
 #   n <- length(x)
 #
-#   p <- nrow(eta_star) - 1
+#   p <- nrow(etak_star) - 1
 #   q <- nrow(wk_star) - 1
-#   K = ncol(eta_star)
+#   K = ncol(etak_star)
 #
 #   # Build the regression design matrices
 #
@@ -112,7 +112,7 @@ sampleLogisticMoE <- function(wk_star, eta_star, x) {
 #   for (i in 1:n) {
 #     zik <- stats::rmultinom(n = 1, size = 1, piik[i,])
 #
-#     mu <- as.numeric(XBeta[i,] %*% eta_star[, zik == 1])
+#     mu <- as.numeric(XBeta[i,] %*% etak_star[, zik == 1])
 #     sigma <- sigmak[zik == 1]
 #
 #     y[i] <- stats::rnorm(n = 1, mean = mu, sd = sigma)
@@ -124,7 +124,7 @@ sampleLogisticMoE <- function(wk_star, eta_star, x) {
 #   # Statistics (means, variances)
 #
 #   # E[yi|xi,zi=k]
-#   Ey_k <- XBeta %*% eta_star
+#   Ey_k <- XBeta %*% etak_star
 #
 #   # E[yi|xi]
 #   Ey <- rowSums(piik * Ey_k)
