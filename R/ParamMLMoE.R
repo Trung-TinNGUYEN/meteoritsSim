@@ -102,15 +102,15 @@ ParamMLMoE <- setRefClass(
           if (i < K){
             if (s_inds[i] < Ks){
               wk[, i] <<- wk_star[, s_inds[i]] +
-                stats::rnorm(n = 1, mean = 0, sd = 0.007*n^(-0.083))
+                stats::rnorm(n = 1, mean = 0, sd = 0.0073*n^(-0.083))
             } else {
               wk[, i] <<- matrix(0, qt, 1) +
-                stats::rnorm(n = 1, mean = 0, sd = 0.007*n^(-0.083))
+                stats::rnorm(n = 1, mean = 0, sd = 0.0073*n^(-0.083))
             }
 
           }
           etak[, i, ] <<- etak_star[, s_inds[i], ] +
-            stats::rnorm(n = 1, mean = 0, sd = 0.007*n^(-0.083))
+            stats::rnorm(n = 1, mean = 0, sd = 0.05*n^(-0.083))
         }
       # We do not initialize the EM algorithm favourably by making
       ## a partition of starting values near the true components.
