@@ -102,10 +102,10 @@ ParamMLMoE <- setRefClass(
           if (i < K){
             if (s_inds[i] < Ks){
               wk[, i] <<- wk_star[, s_inds[i]] +
-                stats::rnorm(n = 1, mean = 0, sd = 0.0073*n^(-0.083))
+                stats::rnorm(n = 1, mean = 0, sd = 0.05*n^(-0.083))
             } else {
               wk[, i] <<- matrix(0, qt, 1) +
-                stats::rnorm(n = 1, mean = 0, sd = 0.0073*n^(-0.083))
+                stats::rnorm(n = 1, mean = 0, sd = 0.05*n^(-0.083))
             }
 
           }
@@ -160,58 +160,28 @@ ParamMLMoE <- setRefClass(
       # }
     },
 
-    MStep = function(paramMLMoE, verbose_IRLS, update_IRLS) {
+    MStep = function(StatMLMoE, verbose_IRLS, update_IRLS) {
 
-      res_irls_Wk <- IRLS(phiWk$XEta, paramMLMoE$tik, ones(nrow(paramMLMoE$tik), 1),
+      res_irls_Wk <- IRLS(phiWk$XEta, StatMLMoE$tik, ones(nrow(StatMLMoE$tik), 1),
                           wk, verbose_IRLS, update_IRLS)
-      paramMLMoE$piikW <- res_irls_Wk$piik
+      StatMLMoE$piikW <- res_irls_Wk$piik
       reg_irls <- res_irls_Wk$reg_irls
 
       wk <<- res_irls_Wk$W
 
-      etak <<- etak + array(0, dim = c(p + 1, K, R-1))
-
-      ## Note that eta <<- array(0, dim = c(p + 1, K, R-1))
       ## wk <<- matrix(0, q + 1, K - 1)
-      ## matrix(paramMLMoE$phiEta$XEta[i, ], nrow = 1)
       ## IRLS(X, Tau, Gamma, Winit, verbose_IRLS, update_IRLS)
-      ## ?Maximum of sum_{i=1}^n is not equivalent to sum of maximum.
-      ## https://math.stackexchange.com/questions/3803010/when-the-maximum-of-sum-is-equal-to-the-sum-of-maxima
-      #
-      # for (k in (1:paramMLMoE$K)){
-      #   for (i in (1:paramMLMoE$n)) {
-      #     res_irls_Eta <<- IRLS(matrix(phiEta$XEta[i, ], nrow = 1),
-      #                           statNMoE$tik,
-      #                           ones(nrow(statNMoE$tik), 1), Eta[, k ,],
-      #                           verbose_IRLS, update_IRLS)
-      #     Eta[, k ,] <<- res_irls_Eta$W
-      #   }
-      # }
+      ## etak <<- etak + array(0, dim = c(p + 1, K, R-1))
 
-            # for (k in (1:paramMLMoE$K)){
-      #   for (i in (1:paramMLMoE$n)) {
-      #     res_irls_Eta <<- IRLS(matrix(phiEta$XEta[i, ], nrow = 1),
-      #                           statNMoE$tik,
-      #                           ones(nrow(statNMoE$tik), 1), Eta[, k ,],
-      #                           verbose_IRLS, update_IRLS)
-      #     Eta[, k ,] <<- res_irls_Eta$W
-      #   }
-      # }
-
-
-      # ## Analytically solving a weighted least-squares problem.
-      # for (k in 1:K) {
-      #
-      #   # Update the regression coefficients
-      #   Xbeta <- phiEta$XEta * sqrt(statNMoE$tik[, k] %*% ones(1, p + 1))
-      #   yk <- Y * sqrt(statNMoE$tik[, k])
-      #
-      #   eta[, k] <<- solve((t(Xbeta) %*% Xbeta)) %*% (t(Xbeta) %*% yk)
-      #
-      #   # Update the variances sigma2k
-      #   sigma2[k] <<- sum(statNMoE$tik[, k] * ((Y - phiEta$XEta %*% eta[, k]) ^ 2)) / sum(statNMoE$tik[, k])
-      #
-      # }
+      for (k in (1:K)){
+        res_irls_Eta <<- IRLS(phiEta$XEta,
+                              StatMLMoE$tik, ones(nrow(StatMLMoE$tik), 1),
+                              matrix(etak[, k, ], nrow = dim(etak)[1]),
+                              verbose_IRLS, update_IRLS)
+        StatMLMoE$piikEta[, k] <- res_irls_Eta$piik[cbind(1:n,Y)]
+        reg_irls <- res_irls_Eta$reg_irls
+        etak[, k ,] <<- res_irls_Eta$W
+      }
 
       return(reg_irls)
     }

@@ -84,7 +84,8 @@ emMLMoE <- function(X, Y, K, R,  p = 1, q = 1, n_tries = 1, max_iter = 1500,
     # print("stat$loglik_inital = ")
     # print(stat$loglik)
 
-    # print(param$sigma2)
+    print(param$wk)
+    print(param$etak)
 
     while (!converge && (iter <= max_iter)) {
 

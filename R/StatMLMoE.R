@@ -151,26 +151,15 @@ StatMLMoE <- setRefClass(
 
       # piikEta <<- zeros(paramMLMoE$n, paramMLMoE$K)
       ## Note that eta <<- array(0, dim = c(p + 1, K, R-1))
-      ## multinomialLogit(W, X, Y, Gamma)$piik  #(nxR)
-      for (i in (1:paramMLMoE$n)) {
-        for (k in (1:paramMLMoE$K)){
-          piikEta[i, k] <<- multinomialLogit(matrix(paramMLMoE$etak[, k, ], nrow = 2),
-                                            matrix(paramMLMoE$phiEta$XEta[i,], nrow = 1),
-                                            ones(1, paramMLMoE$R),
-                                            ones(1, 1))$piik[1,paramMLMoE$Y[i]]
-        }
+      ## Dungway
+      for (k in (1:paramMLMoE$K)){
+        piikEta[, k] <<- multinomialLogit(matrix(paramMLMoE$etak[, k, ],
+                                                 nrow = dim(paramMLMoE$etak)[1]),
+                                          paramMLMoE$phiEta$XEta,
+                                          ones(paramMLMoE$n, paramMLMoE$R),
+                                          ones(paramMLMoE$n, 1))$piik[cbind(1:paramMLMoE$n,
+                                                                            paramMLMoE$Y)]
       }
-
-      ## Only for NMoE()
-      # piik_fik <- zeros(paramMLMoE$n, paramMLMoE$K)
-      # for (k in (1:paramMLMoE$K)) {
-      #
-      #   muk <- paramMLMoE$phiEta$XEta %*% paramMLMoE$eta[, k]
-      #   sigma2k <- paramMLMoE$sigma2[k]
-      #
-      #   log_piik_fik[, k] <<- log(piik[, k]) - 0.5 * log(2 * pi) - 0.5 * log(sigma2k) - 0.5 * ((paramMLMoE$Y - muk) ^ 2) / sigma2k
-      # }
-      ##
 
       for (k in (1:paramMLMoE$K)) {
         log_piik_fik[, k] <<- log(piikW[, k]) + log(piikEta[, k])
